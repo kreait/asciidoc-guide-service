@@ -1,7 +1,7 @@
 <template>
   <div class="guide">
-      <h3>{{title}}</h3>
-      <p>{{excerpt}}</p>
+      <h1 v-html="title"></h1>
+      <div v-html="excerpt"> </div>
   </div>
 </template>
 
@@ -19,14 +19,16 @@ export default class Guide extends Vue {
   @Prop({default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam' +
             ' nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam'})
   private excerpt!: string;
+
+  @Prop({default: ''})
+  private id!: string;
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .guide {
-    border: black dotted thin;
-    min-height: 200px;
+    border-bottom: gray solid 1px;
   }
 h3 {
   margin: 40px 0 0;
@@ -40,6 +42,6 @@ li {
   margin: 0 10px;
 }
 a {
-  color: #42b983;
+  
 }
 </style>

@@ -1,4 +1,4 @@
-package com.kreait.docs
+package com.kreait.docs.data
 
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.MediaType
@@ -15,21 +15,13 @@ class GuideService {
         return emptyList()
     }
 
-
-    private fun map() {
-
-    }
-
-    private fun download(): ByteArray {
+    fun downloadGuides(org: String, repository: String): ByteArray {
         val gitHubTemplate = GitHubTemplate()
         val byteArrayHttpMessageConverter = ByteArrayHttpMessageConverter()
         byteArrayHttpMessageConverter.supportedMediaTypes = listOf(MediaType.ALL)
         gitHubTemplate.restTemplate.messageConverters.add(byteArrayHttpMessageConverter)
-        return gitHubTemplate.restOperations().getForObject("https://api.github.com/repos/kreait/slack-spring-boot-starter/zipball", ByteArray::class.java)!!
-
+        return gitHubTemplate.restOperations().getForObject("https://api.github.com/repos/$org/$repository/zipball", ByteArray::class.java)!!
     }
-
-
 }
 
-data class Guide(val title: String, val excerpt: String, val content: String)
+data class Guide(val id: String, val title: String, val excerpt: String)

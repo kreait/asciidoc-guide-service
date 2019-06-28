@@ -1,14 +1,12 @@
 <template>
   <div>
     <b-container>
-      <h2>Simple</h2>
-      <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-        At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-        Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
-        aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-      <b-row v-for="(guideList) in guides">
-        <b-col v-for="(guide) in guideList" ><guide title="Guide 1"></guide></b-col>
-      </b-row>
+      <h1>GUIDES</h1>
+      <b-col v-for="(guide) in guides">
+          <router-link :to="{ name: 'guides', params: { guideId: guide.id }} ">
+            <guide v-bind:title="guide.title"  v-bind:excerpt="guide.excerpt" v-bind:id="guide.id" ></guide>
+          </router-link>
+      </b-col>
     </b-container>
   </div>
 </template>
@@ -18,6 +16,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Guide from '@/components/Guide.vue';
 import GuideService from '@/services/guide.service';
 import Util from '@/util'
+import VueRouter from 'vue-router';
 
 @Component({
   name: 'guide-group',
@@ -29,13 +28,14 @@ export default class GuideGroup extends Vue {
 
   private guides: any[][] = [];
 
-  public mounted() {
+public mounted() {
     GuideService.get()
-            .then( (response) =>
-              (this.guides = Util.chunk([response.data,response.data,response.data,response.data,response.data],3)));
+            .then( (response) =>{
+              console.log("response: " +response)
+              this.guides = response
+            }
+              );
   }
-
-
 }
 </script>
 
