@@ -17,5 +17,17 @@ import GuideGroup from '@/components/GuideGroup.vue'; // @ is an alias to /src
     'guide-group': GuideGroup,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  data(){
+  
+      return {
+        organisation: this.$route.params.org,
+        repo: this.$route.params.repo,
+        
+      }
+    }
+    public created(){
+      console.log("organisation")
+    }
+}
 </script>

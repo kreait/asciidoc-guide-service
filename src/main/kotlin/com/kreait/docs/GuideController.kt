@@ -25,7 +25,9 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
     fun guides(@PathVariable("org") org: String, @PathVariable("repository") repository: String): MutableList<Guide> {
         val zipFile = downloadZip(org, repository)
         val unzippedRoot: File? = FileUtils.unzipFile(zipFile)
-        val walker = AsciiDocDirectoryWalker(unzippedRoot?.absolutePath + File.separator + "guides")
+        val baseDir = unzippedRoot?.absolutePath + File.separator + ""
+        val walker = AsciiDocDirectoryWalker(baseDir)
+
         val guideList = mutableListOf<Guide>()
 
         walker.forEach { file ->
@@ -33,6 +35,15 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
             var counter = 0
             var length = 0
             var title = ""
+            var parents = listOf<String>()
+            val paths = file.absolutePath.replace(baseDir, "").split("/")
+            if (paths.size > 1) {
+                paths.forEach {
+                    if (!it.contains(".")) {
+
+                    }
+                }
+            }
             file.bufferedReader().forEachLine {
                 if (it.startsWith("image"))
                     excerpt += it
@@ -43,7 +54,7 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
                             length += text.length
                             excerpt += text
                         } else {
-                            title = "$it"
+                            title = it
                         }
                         counter++
 
@@ -56,11 +67,11 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
             val options = OptionsBuilder.options()
                     .baseDir(unzippedRoot)
 
-            println(file.nameWithoutExtension)
 
             guideList.add(Guide(id = file.nameWithoutExtension,
                     title = title.replace("= ", ""),
-                    excerpt = "${asciiDoctor.load(excerpt, options.asMap().plus("doctype" to "article")).content}"))
+                    description = "${asciiDoctor.load(excerpt, options.asMap().plus("doctype" to "article")).content}"))
+
         }
 
         FileUtils.cleanUp(zipFile, unzippedRoot)
@@ -75,26 +86,40 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
         val zipFile = downloadZip(org, repository)
         val unzippedRoot: File? = FileUtils.unzipFile(zipFile)
         val walker = AsciiDocDirectoryWalker(unzippedRoot?.absolutePath + File.separator + "guides")
-        val file = walker.first {
-            it.nameWithoutExtension == id
+
+        var file: File? = null
+        walker.forEach { files ->
+            if (files.isDirectory) {
+                files.listFiles().forEach {
+                    if (it.nameWithoutExtension == id)
+                        file = it
+                }
+            } else if (files.nameWithoutExtension == id)
+                file = files
+        }
+
+        if (file == null) {
+            throw Exception("no guide with id $id found")
         }
         var index = 0
         var description = ""
         var title = ""
-        file.forEachLine {
+        file?.forEachLine {
             if (index == 0) {
                 title = it
             } else {
                 description += "$it \n"
-                println(description)
             }
             index++
         }
         val options = OptionsBuilder.options()
-                .baseDir(unzippedRoot)
-        return Guide(id = file.nameWithoutExtension,
+                .safe(SafeMode.UNSAFE)
+                .docType("manpage")
+                .baseDir(file?.parentFile)
+        println(file?.absolutePath)
+        return Guide(id = file!!.nameWithoutExtension,
                 title = title.replace("= ", ""),
-                excerpt = "${asciiDoctor.load(description, options.asMap().plus("doctype" to "article")).content}")
+                description = "${asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).content}")
     }
 
     private fun loadFile(file: File, unzippedRoot: File): Document? {
@@ -105,6 +130,7 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
                 .safe(SafeMode.SAFE)
                 .baseDir(unzippedRoot)
                 .headerFooter(true)
+                .docType("manpage")
                 .attributes(attributes)
         return asciiDoctor.loadFile(file, options.asMap())
     }

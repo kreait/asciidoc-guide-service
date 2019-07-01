@@ -1,7 +1,7 @@
 <template>
   <div class="guide">
       <h1 v-html="title"></h1>
-      <div v-html="excerpt"> </div>
+      <div v-html="description"> </div>
   </div>
 </template>
 
@@ -18,7 +18,7 @@ export default class Guide extends Vue {
 
   @Prop({default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam' +
             ' nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam'})
-  private excerpt!: string;
+  private description!: string;
 
   @Prop({default: ''})
   private id!: string;
