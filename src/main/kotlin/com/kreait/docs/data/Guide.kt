@@ -24,4 +24,4 @@ class GuideService {
     }
 }
 
-data class Guide(val id: String, val title: String, val description: String, val parents: List<String> = listOf())
+data class Guide(val id: String, val title: String, val excerpt: String = "", val description: String = "")

@@ -4,7 +4,7 @@
       <h1>GUIDES</h1>
       <b-col v-for="(guide) in guides">
           <router-link :to="{ name: 'guides', params: { guideId: guide.id }} ">
-            <guide v-bind:title="guide.title"  v-bind:description="guide.description" v-bind:id="guide.id" ></guide>
+            <guide v-bind:title="guide.title"  v-bind:excerpt="guide.excerpt" v-bind:id="guide.id" ></guide>
           </router-link>
       </b-col>
     </b-container>

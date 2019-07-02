@@ -31,35 +31,11 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
         val guideList = mutableListOf<Guide>()
 
         walker.forEach { file ->
-            var excerpt = ""
-            var counter = 0
-            var length = 0
-            var title = ""
-            var parents = listOf<String>()
             val paths = file.absolutePath.replace(baseDir, "").split("/")
             if (paths.size > 1) {
                 paths.forEach {
                     if (!it.contains(".")) {
 
-                    }
-                }
-            }
-            file.bufferedReader().forEachLine {
-                if (it.startsWith("image"))
-                    excerpt += it
-                else {
-                    if (length <= EXCERPT_LENGTH) {
-                        if (counter != 0) {
-                            val text = it.take(EXCERPT_LENGTH - length) + "\n"
-                            length += text.length
-                            excerpt += text
-                        } else {
-                            title = it
-                        }
-                        counter++
-
-                    } else {
-                        return@forEachLine
                     }
                 }
             }
@@ -69,9 +45,9 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
 
 
             guideList.add(Guide(id = file.nameWithoutExtension,
-                    title = title.replace("= ", ""),
-                    description = "${asciiDoctor.load(excerpt, options.asMap().plus("doctype" to "article")).content}"))
-
+                    title = "${asciiDoctor.loadFile(file, options.asMap()).getAttribute("title")}",
+                    excerpt =
+                    "${asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).getAttribute("excerpt")}"))
         }
 
         FileUtils.cleanUp(zipFile, unzippedRoot)
@@ -99,7 +75,7 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
         }
 
         if (file == null) {
-            throw Exception("no guide with id $id found")
+            throw IllegalArgumentException("no guide with id $id found")
         }
         var index = 0
         var description = ""
@@ -116,10 +92,9 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
                 .safe(SafeMode.UNSAFE)
                 .docType("manpage")
                 .baseDir(file?.parentFile)
-        println(file?.absolutePath)
         return Guide(id = file!!.nameWithoutExtension,
                 title = title.replace("= ", ""),
-                description = "${asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).content}")
+                description = asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).content.toString())
     }
 
     private fun loadFile(file: File, unzippedRoot: File): Document? {

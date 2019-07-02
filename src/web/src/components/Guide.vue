@@ -1,7 +1,7 @@
 <template>
   <div class="guide">
       <h1 v-html="title"></h1>
-      <div v-html="description"> </div>
+      <div class="exce" v-html="excerpt" v-if="excerpt !== ''"> </div>
   </div>
 </template>
 
@@ -16,8 +16,10 @@ export default class Guide extends Vue {
   @Prop({default: 'Guide Title'})
   private title!: string;
 
-  @Prop({default: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam' +
-            ' nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam'})
+  @Prop({default: ''})
+  private excerpt!: string;
+
+  @Prop({default: ''})
   private description!: string;
 
   @Prop({default: ''})
@@ -30,18 +32,20 @@ export default class Guide extends Vue {
   .guide {
     border-bottom: gray solid 1px;
   }
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
+
+  h3 {
+    margin: 40px 0 0;
+  }
   
-}
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  a {
+    
+  }
 </style>
