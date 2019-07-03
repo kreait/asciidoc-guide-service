@@ -7,6 +7,7 @@ buildscript {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2'
     }
 }
+apply plugin: 'org.asciidoctor.convert'
 
 plugins {
     id 'org.springframework.boot' version '2.1.4.RELEASE'
@@ -21,7 +22,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
 repositories {
-    
+    jcenter()
     mavenCentral()
     maven {
         url 'https://repo.spring.io/libs-milestone'
@@ -29,12 +30,10 @@ repositories {
 }
 
 
-apply plugin: 'org.asciidoctor.convert'
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.social:spring-social-github:1.0.0.M4'
-    implementation group: 'org.asciidoctor', name: 'asciidoctorj', version: '2.0.0'
+    implementation group: 'org.asciidoctor', name: 'asciidoctorj', version: '2.1.0'
 
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
 
