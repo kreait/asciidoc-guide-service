@@ -29,7 +29,7 @@ dependencies {
     implementation('org.asciidoctor:asciidoctorj:2.1.0') {
         exclude group: 'org.jruby'
     }
-    implementation 'org.jruby:jruby-complete:9.1.6.0'
+    implementation 'org.jruby:jruby-complete:9.1.8.0'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.social:spring-social-github:1.0.0.M4'
