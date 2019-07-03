@@ -1,27 +1,18 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2'
-    }
-}
-
 plugins {
     id 'org.springframework.boot' version '2.1.4.RELEASE'
     id 'org.jetbrains.kotlin.jvm' version '1.2.71'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.2.71'
 }
-apply plugin: 'org.asciidoctor.convert'
+
+
 apply plugin: 'io.spring.dependency-management'
+
 
 group = 'com.kreait'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
 repositories {
-    jcenter()
     mavenCentral()
     maven {
         url 'https://repo.spring.io/libs-milestone'
@@ -29,12 +20,19 @@ repositories {
 }
 
 
+bootJar {
+    requiresUnpack 'org.jruby:jruby-complete'
+    requiresUnpack 'org.asciidoctor:asciidoctorj'
+}
+
 dependencies {
+    implementation('org.asciidoctor:asciidoctorj:2.1.0') {
+        exclude group: 'org.jruby'
+    }
+    implementation 'org.jruby:jruby-complete:9.1.6.0'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.social:spring-social-github:1.0.0.M4'
-    implementation group: 'org.asciidoctor', name: 'asciidoctorj', version: '2.1.0'
-
-    implementation group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
 
 
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
