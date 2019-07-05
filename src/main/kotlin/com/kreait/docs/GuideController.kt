@@ -18,13 +18,11 @@ import java.io.File
 
 @RestController
 class GuideController @Autowired constructor(val guideService: GuideService) {
-    private lateinit var asciiDoctor :Asciidoctor
+    private lateinit var asciiDoctor: Asciidoctor
     private val EXCERPT_LENGTH = 200
     @GetMapping("/guides/{org}/{repository}")
     @Cacheable("guides")
     fun guides(@PathVariable("org") org: String, @PathVariable("repository") repository: String): MutableList<Guide> {
-        System.setProperty("jruby.compat.version", "RUBY1_9");
-        System.setProperty("jruby.compile.mode", "OFF");
         val zipFile = downloadZip(org, repository)
         val unzippedRoot: File? = FileUtils.unzipFile(zipFile)
         val baseDir = unzippedRoot?.absolutePath + File.separator + ""
