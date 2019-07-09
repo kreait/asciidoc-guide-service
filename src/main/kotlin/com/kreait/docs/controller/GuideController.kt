@@ -1,13 +1,11 @@
-package com.kreait.docs
+package com.kreait.docs.controller
 
 import com.kreait.docs.common.FileUtils
 import com.kreait.docs.data.Guide
-import com.kreait.docs.data.GuideService
+import com.kreait.docs.service.GithubService
 import org.asciidoctor.Asciidoctor
-import org.asciidoctor.Attributes
 import org.asciidoctor.OptionsBuilder
 import org.asciidoctor.SafeMode
-import org.asciidoctor.ast.Document
 import org.asciidoctor.jruby.AsciiDocDirectoryWalker
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
@@ -17,33 +15,22 @@ import org.springframework.web.bind.annotation.RestController
 import java.io.File
 
 @RestController
-class GuideController @Autowired constructor(val guideService: GuideService) {
+class GuideController @Autowired constructor(val guideService: GithubService) {
     private lateinit var asciiDoctor: Asciidoctor
-    private val EXCERPT_LENGTH = 200
+
     @GetMapping("/guides/{org}/{repository}")
     @Cacheable("guides")
     fun guides(@PathVariable("org") org: String, @PathVariable("repository") repository: String): MutableList<Guide> {
         val zipFile = downloadZip(org, repository)
         val unzippedRoot: File? = FileUtils.unzipFile(zipFile)
-        val baseDir = unzippedRoot?.absolutePath + File.separator + ""
+        val baseDir = unzippedRoot?.absolutePath + File.separator + "guides"
         val walker = AsciiDocDirectoryWalker(baseDir)
         asciiDoctor = Asciidoctor.Factory.create()
         val guideList = mutableListOf<Guide>()
 
         walker.forEach { file ->
-            val paths = file.absolutePath.replace(baseDir, "").split("/")
-            if (paths.size > 1) {
-                paths.forEach {
-                    if (!it.contains(".")) {
-
-                    }
-                }
-            }
-
             val options = OptionsBuilder.options()
                     .baseDir(unzippedRoot)
-
-
             guideList.add(Guide(id = file.nameWithoutExtension,
                     title = "${asciiDoctor.loadFile(file, options.asMap()).getAttribute("title")}",
                     excerpt =
@@ -97,23 +84,9 @@ class GuideController @Autowired constructor(val guideService: GuideService) {
                 description = asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).content.toString())
     }
 
-    private fun loadFile(file: File, unzippedRoot: File): Document? {
-        val attributes = Attributes()
-        attributes.setAllowUriRead(true)
-        attributes.setSkipFrontMatter(true)
-        val options = OptionsBuilder.options()
-                .safe(SafeMode.SAFE)
-                .baseDir(unzippedRoot)
-                .headerFooter(true)
-                .docType("manpage")
-                .attributes(attributes)
-        return asciiDoctor.loadFile(file, options.asMap())
-    }
-
-
     private fun downloadZip(org: String, repository: String): File? {
         try {
-            return FileUtils.createZipFile(guideService.downloadGuides(org, repository))
+            return FileUtils.createZipFile(guideService.downloadRepository(org, repository))
         } catch (e: Exception) {
             e.printStackTrace()
         }
