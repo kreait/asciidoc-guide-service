@@ -33,9 +33,10 @@ class GuideController @Autowired constructor(val guideService: GithubService) {
                     .baseDir(unzippedRoot)
             guideList.add(Guide(id = file.nameWithoutExtension,
                     title = "${asciiDoctor.loadFile(file, options.asMap()).getAttribute("title")}",
-                    excerpt =
-                    "${asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).getAttribute("excerpt")}"))
+                    order = asciiDoctor.loadFile(file, options.asMap()).getAttribute("order").toString().toInt(),
+                    excerpt = "${asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).getAttribute("excerpt")}"))
         }
+        guideList.sortBy { it.order }
 
         FileUtils.cleanUp(zipFile, unzippedRoot)
         return guideList
