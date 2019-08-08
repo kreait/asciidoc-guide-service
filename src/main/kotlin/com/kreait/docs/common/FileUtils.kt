@@ -1,13 +1,19 @@
 package com.kreait.docs.common
 
+import com.kreait.docs.service.GithubService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import org.springframework.util.FileSystemUtils
 import org.springframework.util.StreamUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
 
-class FileUtils() {
+@Component
+class FileUtils @Autowired constructor(private val ghService: GithubService) {
+
     companion object {
+
         fun createZipFile(content: ByteArray): File? {
             val zipball = File.createTempFile("prefix", ".zip")
             zipball.deleteOnExit()
@@ -17,7 +23,23 @@ class FileUtils() {
             return zipball
         }
 
-        fun unzipFile(zipball: File?): File? {
+        fun cleanUp(zipFile: File?, unzippedRoot: File?) {
+            FileSystemUtils.deleteRecursively(zipFile)
+            FileSystemUtils.deleteRecursively(unzippedRoot)
+        }
+    }
+
+    fun downloadZip(org: String, repository: String): File? {
+        try {
+            return createZipFile(ghService.downloadRepository(org, repository))
+        } catch (e: Exception) {
+            println("Could not find repository.")
+        }
+        return null
+    }
+
+    fun unzipFile(zipball: File?): File? {
+        try {
             val zipFile = ZipFile(zipball)
             var unzipped: File? = null
             zipFile.stream()
@@ -34,11 +56,9 @@ class FileUtils() {
                         }
                     }
             return unzipped
-        }
-
-        fun cleanUp(zipFile: File?, unzippedRoot: File?) {
-            FileSystemUtils.deleteRecursively(zipFile)
-            FileSystemUtils.deleteRecursively(unzippedRoot)
+        } catch (e: Exception) {
+            println("Unable to unzip file. Attempted to extract a non-existing file.")
+            return null
         }
     }
 }
