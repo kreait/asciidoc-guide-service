@@ -19,13 +19,18 @@ class AsciiDocUtils {
     fun walkAndSort(dir: String, zipFile: File?, unzippedRoot: File?): MutableList<Guide> {
 
         val walker = AsciiDocDirectoryWalker(dir)
+
+
         walker.forEach { file ->
             val options = OptionsBuilder.options().baseDir(unzippedRoot)
+            val optionsDoctype = options.asMap().plus("doctype" to "article")
+            val loadedFile = asciiDoctor.loadFile(file, options.asMap())
+
             guideList.add(Guide(
                     id = file.nameWithoutExtension,
-                    title = "${asciiDoctor.loadFile(file, options.asMap()).getAttribute("title")}",
-                    order = asciiDoctor.loadFile(file, options.asMap()).getAttribute("order").toString().toInt(),
-                    excerpt = "${asciiDoctor.loadFile(file, options.asMap().plus("doctype" to "article")).getAttribute("excerpt")}"
+                    title = "${loadedFile.getAttribute("title")}",
+                    order = loadedFile.getAttribute("order").toString().toInt(),
+                    excerpt = "${asciiDoctor.loadFile(file, optionsDoctype).getAttribute("excerpt")}"
             ))
         }
         guideList.sortBy { it.order }
