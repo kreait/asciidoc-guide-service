@@ -54,18 +54,18 @@ class AsciiDocUtils {
             } else if (files.nameWithoutExtension == id) {
                 file = files
             }
-
-            if (file == null) throw IllegalArgumentException("No guide with id $id found")
-
-            file?.forEachLine {
-                if (index == 0) {
-                    title = it
-                } else {
-                    description += "$it \n"
-                }
-                index++
-            }
         }
+        if (file == null) throw IllegalArgumentException("No guide with id $id found")
+
+        file?.forEachLine {
+            if (index == 0) {
+                title = it
+            } else {
+                description += "$it \n"
+            }
+            index++
+        }
+
 
         val options = OptionsBuilder.options()
                 .safe(SafeMode.UNSAFE)
