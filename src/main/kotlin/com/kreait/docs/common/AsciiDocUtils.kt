@@ -2,22 +2,19 @@ package com.kreait.docs.common
 
 import com.kreait.docs.data.Guide
 import org.asciidoctor.Asciidoctor
-import org.asciidoctor.Options
 import org.asciidoctor.OptionsBuilder
 import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciiDocDirectoryWalker
 import org.springframework.stereotype.Component
 import java.io.File
-import java.lang.IllegalArgumentException
 
 @Component
 class AsciiDocUtils {
 
     private var asciiDoctor = Asciidoctor.Factory.create()
-    private val guideList = mutableListOf<Guide>()
 
     fun walkAndSort(dir: String, zipFile: File?, unzippedRoot: File?): MutableList<Guide> {
-
+        val guideList = mutableListOf<Guide>()
         val walker = AsciiDocDirectoryWalker(dir)
 
 
